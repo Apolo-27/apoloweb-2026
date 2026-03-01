@@ -42,12 +42,12 @@ next-env.d.ts
 
 roadmap.md
 
-.agent
-.agents
-.claude
-.codex
-.cursor
-.gemini
-.opencode
-.trae
-.windsurf
+# .agent
+# .agents
+# .claude
+# .codex
+# .cursor
+# .gemini
+# .opencode
+# .trae
+# .windsurf

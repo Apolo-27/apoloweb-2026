@@ -41,9 +41,9 @@ export default function STEMSectionNew() {
                 className="relative w-full stem-section-top-spacing"
             >
                 {/* Title Section */}
+                {/* Title + Gallery Container */}
                 <div
-                    style={{ height: '600px', position: 'relative' }}
-                    className="flex flex-col items-center justify-center pt-20"
+                    className="stem-gallery-container flex flex-col items-center justify-center pt-20"
                 >
                     <div className="text-center mb-0 relative z-10 pointer-events-none">
                         <p className="text-zinc-400 text-xs sm:text-sm font-light tracking-[0.3em] uppercase mb-4">

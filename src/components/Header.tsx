@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 import LanguageSwitcher from './LanguageSwitcher';
 import NavigationMenu from './NavigationMenu';
 
@@ -15,15 +16,17 @@ export default function Header() {
     >
       {/* Logo - Top Left with spacing */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6 md:top-8 md:left-10">
-        <div className="header-logo relative w-28 h-14 sm:w-28 sm:h-14 md:w-36 md:h-18">
-          <Image
-            src="/images/Apolo 27 HP - blanco.png"
-            alt="Apolo 27 Logo"
-            fill
-            className="object-contain"
-            priority
-          />
-        </div>
+        <Link href="/">
+          <div className="header-logo relative w-28 h-14 sm:w-28 sm:h-14 md:w-36 md:h-18 cursor-pointer">
+            <Image
+              src="/images/Apolo 27 HP - blanco.png"
+              alt="Apolo 27 Logo"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+        </Link>
       </div>
 
       {/* Right Side Controls - Language Switcher & Navigation Menu */}

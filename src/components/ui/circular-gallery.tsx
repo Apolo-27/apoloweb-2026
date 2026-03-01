@@ -1,7 +1,7 @@
 "use client"
 
 import { Camera, Mesh, Plane, Program, Renderer, Texture, Transform } from 'ogl';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type GL = Renderer['gl'];
 
@@ -656,6 +656,30 @@ interface CircularGalleryProps {
     scrollEase?: number;
 }
 
+/* ── Mobile Fallback: CSS-only scroll-snap gallery ── */
+function MobileFallbackGallery({ items }: { items?: { image: string; text: string }[] }) {
+    const fallbackItems = items && items.length > 0 ? items : [];
+    // Duplicate items for seamless infinite scroll effect
+    const displayItems = [...fallbackItems, ...fallbackItems, ...fallbackItems];
+
+    return (
+        <div className="stem-mobile-gallery-wrapper">
+            <div className="stem-mobile-gallery-track">
+                {displayItems.map((item, index) => (
+                    <div key={index} className="stem-mobile-gallery-slide">
+                        <img
+                            src={item.image}
+                            alt={item.text || `STEM activity ${(index % fallbackItems.length) + 1}`}
+                            className="stem-mobile-gallery-img"
+                            loading="lazy"
+                        />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export default function CircularGallery({
     items,
     bend = 3,
@@ -666,16 +690,26 @@ export default function CircularGallery({
     scrollEase = 0.05
 }: CircularGalleryProps) {
     const containerRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        if (!containerRef.current) return;
+    const [useFallback, setUseFallback] = useState(false);
 
-        // Safety check for WebGL support
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) {
-            console.error('WebGL not supported');
+    useEffect(() => {
+        // Check if mobile or WebGL not supported
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            setUseFallback(true);
             return;
         }
+
+        const testCanvas = document.createElement('canvas');
+        const gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+        if (!gl) {
+            setUseFallback(true);
+            return;
+        }
+    }, []);
+
+    useEffect(() => {
+        if (useFallback || !containerRef.current) return;
 
         let app: App | null = null;
         try {
@@ -690,6 +724,7 @@ export default function CircularGallery({
             });
         } catch (error) {
             console.error('Failed to initialize CircularGallery:', error);
+            setUseFallback(true);
         }
 
         return () => {
@@ -697,6 +732,11 @@ export default function CircularGallery({
                 app.destroy();
             }
         };
-    }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase]);
+    }, [useFallback, items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase]);
+
+    if (useFallback) {
+        return <MobileFallbackGallery items={items} />;
+    }
+
     return <div className="w-full h-full overflow-hidden cursor-grab active:cursor-grabbing" ref={containerRef} />;
 }

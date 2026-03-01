@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import createGlobe, { COBEOptions } from "cobe"
 import { useMotionValue, useSpring } from "motion/react"
 
@@ -11,7 +11,7 @@ const MOVEMENT_DAMPING = 1400
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
   height: 800,
-  onRender: () => {},
+  onRender: () => { },
   devicePixelRatio: 2,
   phi: 0,
   theta: 0.3,
@@ -36,6 +36,26 @@ const GLOBE_CONFIG: COBEOptions = {
   ],
 }
 
+/* ── Fallback: radial gradient sphere when WebGL fails ── */
+function GlobeFallback({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "absolute inset-0 mx-auto aspect-[1/1] w-full max-w-[600px]",
+        className
+      )}
+    >
+      <div
+        className="size-full rounded-full opacity-80"
+        style={{
+          background: 'radial-gradient(circle at 35% 35%, rgba(90,90,90,0.7) 0%, rgba(40,40,40,0.8) 40%, rgba(15,15,15,0.9) 70%, transparent 100%)',
+          boxShadow: '0 0 80px 20px rgba(180, 50, 50, 0.15), inset 0 0 60px rgba(0,0,0,0.5)',
+        }}
+      />
+    </div>
+  )
+}
+
 export function Globe({
   className,
   config = GLOBE_CONFIG,
@@ -48,6 +68,7 @@ export function Globe({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const pointerInteracting = useRef<number | null>(null)
   const pointerInteractionMovement = useRef(0)
+  const [showFallback, setShowFallback] = useState(false)
 
   const r = useMotionValue(0)
   const rs = useSpring(r, {
@@ -72,6 +93,8 @@ export function Globe({
   }
 
   useEffect(() => {
+    if (!canvasRef.current) return
+
     const onResize = () => {
       if (canvasRef.current) {
         width = canvasRef.current.offsetWidth
@@ -81,24 +104,51 @@ export function Globe({
     window.addEventListener("resize", onResize)
     onResize()
 
-    const globe = createGlobe(canvasRef.current!, {
-      ...config,
-      width: width * 2,
-      height: width * 2,
-      onRender: (state) => {
-        if (!pointerInteracting.current) phi += 0.005
-        state.phi = phi + rs.get()
-        state.width = width * 2
-        state.height = width * 2
-      },
-    })
+    // If width is 0, the canvas isn't laid out yet — show fallback
+    if (width === 0) {
+      window.removeEventListener("resize", onResize)
+      setShowFallback(true)
+      return
+    }
 
-    setTimeout(() => (canvasRef.current!.style.opacity = "1"), 0)
+    // Reduce DPR on mobile for performance
+    const isMobile = window.innerWidth <= 768
+    const effectiveDpr = isMobile ? 1 : (config.devicePixelRatio ?? 2)
+
+    let globe: ReturnType<typeof createGlobe> | null = null
+    try {
+      globe = createGlobe(canvasRef.current, {
+        ...config,
+        devicePixelRatio: effectiveDpr,
+        width: width * 2,
+        height: width * 2,
+        onRender: (state) => {
+          if (!pointerInteracting.current) phi += 0.005
+          state.phi = phi + rs.get()
+          state.width = width * 2
+          state.height = width * 2
+        },
+      })
+
+      setTimeout(() => {
+        if (canvasRef.current) {
+          canvasRef.current.style.opacity = "1"
+        }
+      }, 0)
+    } catch (error) {
+      console.warn('Globe failed to initialize:', error)
+      setShowFallback(true)
+    }
+
     return () => {
-      globe.destroy()
+      if (globe) globe.destroy()
       window.removeEventListener("resize", onResize)
     }
   }, [rs, config])
+
+  if (showFallback) {
+    return <GlobeFallback className={className} />
+  }
 
   return (
     <div
