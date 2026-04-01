@@ -56,14 +56,14 @@ export default function NavigationMenu() {
         setIsOpen(false);
 
         if (item.type === 'route' && item.path) {
-            router.push(item.path);
+            router.push(`/${language}${item.path}`);
             setActiveItem(item.id);
             return;
         }
 
         // Scroll logic
-        if (pathname !== '/') {
-            router.push(`/#${item.id}`);
+        if (pathname !== `/${language}` && pathname !== `/${language}/`) {
+            router.push(`/${language}/#${item.id}`);
             // Note: Active item state might reset on navigation, which is expected behavior
         } else {
             const element = document.getElementById(item.id);

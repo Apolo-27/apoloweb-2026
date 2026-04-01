@@ -5,8 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import LanguageSwitcher from './LanguageSwitcher';
 import NavigationMenu from './NavigationMenu';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Header() {
+  const { language } = useLanguage();
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
@@ -16,8 +18,8 @@ export default function Header() {
     >
       {/* Logo - Top Left with spacing */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6 md:top-8 md:left-10">
-        <Link href="/">
-          <div className="header-logo relative w-28 h-14 sm:w-28 sm:h-14 md:w-36 md:h-18 cursor-pointer">
+        <Link href={`/${language}`}>
+          <div className="flex items-center gap-3 md:gap-4 relative group w-[90px] h-[35px] sm:w-[100px] sm:h-[40px] md:w-[130px] md:h-[45px] hover:scale-105 transition-all duration-300">
             <Image
               src="/images/Apolo 27 HP - blanco.png"
               alt="Apolo 27 Logo"

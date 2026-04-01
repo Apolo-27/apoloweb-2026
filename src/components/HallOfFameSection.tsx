@@ -61,7 +61,7 @@ export default function HallOfFameSection() {
     ];
 
     const handleEnterClick = () => {
-        router.push('/hall-of-fame');
+        router.push(`/${language}/hall-of-fame`);
     };
 
     return (
