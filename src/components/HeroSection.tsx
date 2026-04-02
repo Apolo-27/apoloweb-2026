@@ -66,6 +66,8 @@ export default function HeroSection() {
                     poster="/images/moon_poster.jpg"
                     className="absolute inset-0 w-full h-full object-cover scale-[1.15]"
                 >
+                    <source src="/videos/moon_cinematic5.webm" type="video/webm" />
+                    {/* <source src="/videos/moon_cinematic4.webm" type="video/webm" /> */}
                     <source src="/videos/moon_cinematic3.mp4" type="video/mp4" />
                 </video>
                 {/* Dark overlay - stronger for better readability */}
