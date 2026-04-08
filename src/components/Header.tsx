@@ -19,7 +19,7 @@ export default function Header() {
       {/* Logo - Top Left with spacing */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6 md:top-8 md:left-10">
         <Link href={`/${language}`}>
-          <div className="flex items-center gap-3 md:gap-4 relative group w-[90px] h-[35px] sm:w-[100px] sm:h-[40px] md:w-[130px] md:h-[45px] hover:scale-105 transition-all duration-300">
+          <div className="flex items-center gap-3 md:gap-4 relative group w-[115px] h-[45px] sm:w-[130px] sm:h-[52px] md:w-[165px] md:h-[58px] hover:scale-105 transition-all duration-300">
             <Image
               src="/images/Apolo 27 HP - blanco.png"
               alt="Apolo 27 Logo"
